@@ -2,6 +2,7 @@ package com.example.affabblebeanui.service;
 
 import com.example.affabblebeanui.ds.CartBean;
 import com.example.affabblebeanui.ds.ProductDto;
+import com.example.affabblebeanui.ds.TransPortInfoEntity;
 import com.example.affabblebeanui.dto.Product;
 import com.example.affabblebeanui.dto.Products;
 import com.example.affabblebeanui.exception.ProductNotFoundException;
@@ -26,7 +27,7 @@ public class ProductClientService {
     @PostConstruct
     public void init(){
         ResponseEntity<Products> response =template
-                .getForEntity("http://localhost:8080/backend/products"
+                .getForEntity("http://localhost:8099/backend/products"
                         , Products.class);
         if (response.getStatusCode().is2xxSuccessful()){
             this.products=
@@ -56,11 +57,19 @@ public class ProductClientService {
     }
 
     record TransPortInfo(String email){}
-    public void findTransPortInfo(String email) {
-        var transPortInfo=new TransPortInfo(email);
-        ResponseEntity<String> response=template.postForEntity("http://localhost:8050/transport/find-transport-info",
-                transPortInfo,String.class);
-        System.out.println(response);
+    public TransPortInfoEntity findTransPortInfo(String email) {
+        var transPortInfo = new TransPortInfo(email);
+        ResponseEntity<TransPortInfoEntity> response=template.postForEntity("http://localhost:8050/transport/find-transport-info",
+                transPortInfo, TransPortInfoEntity.class);
+//        System.out.println(response);
+        TransPortInfoEntity entity = new TransPortInfoEntity();
+        if(response.getStatusCode().is2xxSuccessful()){
+            entity.setProducts(response.getBody().getProducts());
+            entity.setEmail(response.getBody().getEmail());
+            entity.setTotalAmount(response.getBody().getTotalAmount());
+            entity.setCustomerName(response.getBody().getCustomerName());
+        }
+        return entity;
     }
     //http://localhost:8050/transport/find-transport-info
 
