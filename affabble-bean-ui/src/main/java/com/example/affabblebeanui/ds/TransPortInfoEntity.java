@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -13,20 +14,18 @@ import java.util.Set;
 @ToString
 public  class TransPortInfoEntity {
 
-        @JsonProperty("customer_name") private Set<String> customerName;
+        @JsonProperty("customer_name") private List<String> customerName;
         private String email;
         private List<ProductDto> products;
-        @JsonProperty("total_amount")
-        private List<Double> totalAmount;
+        private List<CustomerOrder> customerOrderList = new ArrayList<>();
 
-        public TransPortInfoEntity(){
-
+        public TransPortInfoEntity() {
         }
 
-        public TransPortInfoEntity(Set<String> customerName, String email, List<ProductDto> products, List<Double> totalAmount) {
+        public TransPortInfoEntity(List<String> customerName, String email, List<ProductDto> products, List<CustomerOrder> customerOrderList) {
                 this.customerName = customerName;
                 this.email = email;
                 this.products = products;
-                this.totalAmount = totalAmount;
+                this.customerOrderList = customerOrderList;
         }
 }

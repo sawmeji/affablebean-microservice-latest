@@ -16,17 +16,20 @@ public  class TransPortInfoResponse{
         @JsonProperty("customer_name") private Set<String> customerName;
         private String email;
         private List<ProductDto> products;
-        @JsonProperty("total_amount")
-        private List<Double> totalAmount;
+        /*@JsonProperty("total_amount")
+        private List<Double> totalAmount;*/
+
+
+        private List<CustomerOrder> customerOrder;
 
         public TransPortInfoResponse(){
 
         }
 
-        public TransPortInfoResponse(Set<String> customerName, String email, List<ProductDto> products, List<Double> totalAmount) {
+        public TransPortInfoResponse(Set<String> customerName, String email, List<ProductDto> products, List<CustomerOrder> customerOrder) {
                 this.customerName = customerName;
                 this.email = email;
                 this.products = products;
-                this.totalAmount = totalAmount;
+                this.customerOrder = customerOrder;
         }
 }

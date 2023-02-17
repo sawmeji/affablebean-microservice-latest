@@ -1,10 +1,11 @@
 package com.example.affabblebeanui.service;
 
 import com.example.affabblebeanui.ds.CartBean;
-import com.example.affabblebeanui.ds.ProductDto;
+import com.example.affabblebeanui.ds.CustomerOrder;
 import com.example.affabblebeanui.ds.TransPortInfoEntity;
 import com.example.affabblebeanui.dto.Product;
 import com.example.affabblebeanui.dto.Products;
+import com.example.affabblebeanui.exception.AuthenticationException;
 import com.example.affabblebeanui.exception.ProductNotFoundException;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.PostConstruct;
@@ -27,7 +28,7 @@ public class ProductClientService {
     @PostConstruct
     public void init(){
         ResponseEntity<Products> response =template
-                .getForEntity("http://localhost:8099/backend/products"
+                .getForEntity("http://localhost:8080/backend/products"
                         , Products.class);
         if (response.getStatusCode().is2xxSuccessful()){
             this.products=
@@ -56,20 +57,30 @@ public class ProductClientService {
         return this.products;
     }
 
-    record TransPortInfo(String email){}
-    public TransPortInfoEntity findTransPortInfo(String email) {
-        var transPortInfo = new TransPortInfo(email);
-        ResponseEntity<TransPortInfoEntity> response=template.postForEntity("http://localhost:8050/transport/find-transport-info",
-                transPortInfo, TransPortInfoEntity.class);
+    record TransPortInfo(String email, String password){}
+    public TransPortInfoEntity findTransPortInfo(String email, String password) {
+
+        try{
+            var transPortInfo = new TransPortInfo(email, password);
+            ResponseEntity<TransPortInfoEntity> response=template.postForEntity("http://localhost:8080/transport/find-transport-info",
+                    transPortInfo, TransPortInfoEntity.class);
 //        System.out.println(response);
-        TransPortInfoEntity entity = new TransPortInfoEntity();
-        if(response.getStatusCode().is2xxSuccessful()){
-            entity.setProducts(response.getBody().getProducts());
-            entity.setEmail(response.getBody().getEmail());
-            entity.setTotalAmount(response.getBody().getTotalAmount());
-            entity.setCustomerName(response.getBody().getCustomerName());
+            TransPortInfoEntity entity = new TransPortInfoEntity();
+            if(response.getStatusCode().is2xxSuccessful()){
+                entity.setProducts(response.getBody().getProducts());
+                entity.setEmail(response.getBody().getEmail());
+                List<CustomerOrder> customerOrders=response.getBody().getCustomerOrderList();
+                entity.setCustomerOrderList(response.getBody().getCustomerOrderList());
+                System.out.println(customerOrders);
+                entity.setCustomerName(response.getBody().getCustomerName());
+            } /*else if (response.getStatusCode().is4xxClientError()) {
+            throw new AuthenticationException("Login Error!");
+        }*/
+            return entity;
+        }catch (Exception e){
+            throw new AuthenticationException("Login Error!");
         }
-        return entity;
+
     }
     //http://localhost:8050/transport/find-transport-info
 
@@ -102,7 +113,7 @@ public class ProductClientService {
         );
         try{
             ResponseEntity<String> response=template
-                    .postForEntity("http://localhost:8060/payment/transfer",
+                    .postForEntity("http://localhost:8080/payment/transfer",
                             request,String.class);
             if(response.getStatusCode().is2xxSuccessful()){
                 System.out.println("Successfully Check Out!");
@@ -113,7 +124,7 @@ public class ProductClientService {
                         total
 
                 );
-                template.postForEntity("http://localhost:8050/transport/save-transport-info",
+                template.postForEntity("http://localhost:8080/transport/save-transport-info",
                         transPortInfo,String.class);
                 cartBean.clearCart();
             }

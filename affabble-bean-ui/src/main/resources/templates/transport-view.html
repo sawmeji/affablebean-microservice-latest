@@ -2,7 +2,36 @@
 <html th:replace="layouts/masterLayout :: layout(~{::main})" lang="en" xmlns:th="http://www.thymeleaf.org">
 <body>
 <main role="main">
-
+    <div class="container my-5">
+        <div class="d-flex mb-3 justify-content-between">
+            <span th:text="${customerName}"></span>
+            <span th:text="${email}"></span>
+            <span th:text="${'$'+ totalAmount}"></span>
+        </div>
+            <div class="row">
+                <div class="col">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>ProductId</th>
+                            <th>Name</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="pro : ${products}">
+                            <td th:text="${pro.orderId}"></td>
+                            <td th:text="${pro.name}"></td>
+                            <td th:text="${pro.price}"></td>
+                            <td th:text="${pro.quantity}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </main>
 </body>
 </html>
